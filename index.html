@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy New Year 2026, Acit!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Sacramento&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+      /* * CSS VARIABLES & RESET */
+      :root {
+        --primary: #800000;
+        --primary-light: #a52a2a;
+        --dark: #0f172a;
+        --darker: #020617;
+        --light: #f8fafc;
+        --gold: #fbbf24;
+        --accent: #ec4899;
+        --glass: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --font-main: 'Inter', sans-serif;
+        --font-serif: 'Playfair Display', serif;
+        --font-script: 'Sacramento', cursive;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--darker);
+        color: var(--light);
+        font-family: var(--font-main);
+        overflow-x: hidden;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      /* SCROLLBAR */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--darker);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 4px;
+      }
+
+      /* CANVAS BACKGROUND */
+      #star-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.8;
+      }
+
+      /* UTILITIES */
+      .hidden {
+        display: none !important;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .flex-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* TYPOGRAPHY */
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-serif);
+        color: var(--light);
+      }
+      .script-font {
+        font-family: var(--font-script);
+        font-size: 2.5rem;
+        color: var(--gold);
+      }
+      .highlight {
+        color: var(--primary);
+        font-weight: bold;
+      }
+      .gradient-text {
+        background: linear-gradient(to right, #fff, #fbbf24);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* * SECTION 1: MINIGAME (WAKE UP ACIT) */
+      #game-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 999;
+        flex-direction: column;
+        transition: opacity 1s ease;
+      }
+
+      .phone-screen {
+        width: 320px;
+        height: 600px; /* Sedikit lebih tinggi agar lega */
+        max-height: 90vh; /* Responsive height */
+        background: linear-gradient(180deg, #1e293b, #0f172a);
+        border: 4px solid #334155;
+        border-radius: 30px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly; /* Distribusi elemen merata */
+        box-shadow: 0 0 50px rgba(128, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Wrapper untuk bagian atas HP (Nama & Foto) */
+      .phone-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 1.5rem; /* Jarak antara teks dan foto */
+      }
+
+      .avatar-container {
+        width: 140px; /* Sedikit lebih besar */
+        height: 140px;
+        border-radius: 50%;
+        border: 4px solid var(--primary);
+        overflow: hidden;
+        position: relative;
+        animation: pulse-ring 2s infinite;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .avatar-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .contact-info {
+        text-align: center;
+      }
+      .contact-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .contact-status {
+        font-size: 1rem;
+        color: #94a3b8;
+        margin-top: 5px;
+        animation: blink 1.5s infinite;
+      }
+
+      /* Wrapper untuk bagian bawah HP (Progress & Tombol) */
+      .phone-controls {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .progress-container {
+        width: 100%;
+        background: #334155;
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        transition: width 0.1s linear;
+      }
+
+      .btn-wrapper {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-top: 1rem;
+      }
+
+      .call-btn {
+        width: 75px;
+        height: 75px;
+        border-radius: 50%;
+        background: #22c55e;
+        color: white;
+        font-size: 2rem;
+        border: none;
+        cursor: pointer;
+        animation: bounce 1s infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        transition: transform 0.1s;
+      }
+      .call-btn:active {
+        transform: scale(0.9);
+      }
+      .game-hint {
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        text-align: center;
+        opacity: 0.8;
+      }
+
+      /* * SECTION 2: MAIN CONTENT */
+      #main-content {
+        opacity: 0;
+        transition: opacity 2s ease;
+        padding-bottom: 100px;
+      }
+
+      .hero-section {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding-top: 4rem;
+      }
+
+      .profile-card {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-top: 2rem;
+        max-width: 500px;
+        transform: translateY(20px);
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 5px 12px;
+        background: rgba(128, 0, 0, 0.2);
+        border: 1px solid var(--primary);
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin: 5px;
+        color: #fac7c7;
+      }
+
+      .typewriter {
+        display: inline-block;
+        font-family: var(--font-serif);
+        font-size: 1.2rem;
+        line-height: 1.6;
+        min-height: 60px;
+        margin-bottom: 2rem;
+        color: #e2e8f0;
+      }
+
+      /* * SECTION 3: THE LETTER */
+      .letter-container {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 3rem;
+        border-radius: 10px;
+        margin-top: 4rem;
+        position: relative;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+      .letter-container::before {
+        content: '"';
+        position: absolute;
+        top: -20px;
+        left: 20px;
+        font-size: 8rem;
+        font-family: var(--font-serif);
+        color: var(--primary);
+        opacity: 0.3;
+      }
+      .letter-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #cbd5e1;
+        text-align: justify;
+        margin-bottom: 1.5rem;
+      }
+
+      /* BUTTONS */
+      .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
+      .btn {
+        padding: 12px 24px;
+        border-radius: 30px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-family: var(--font-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 15px rgba(128, 0, 0, 0.4);
+      }
+      .btn-primary:hover {
+        background: #600000;
+        transform: translateY(-2px);
+      }
+      .btn-secondary {
+        background: transparent;
+        border: 1px solid var(--light);
+        color: var(--light);
+      }
+      .btn-secondary:hover {
+        background: var(--light);
+        color: var(--dark);
+      }
+
+      /* EASTER EGGS & MUSIC */
+      .easter-egg {
+        cursor: pointer;
+        transition: transform 0.2s;
+        display: inline-block;
+      }
+      .easter-egg:hover {
+        transform: scale(1.2) rotate(10deg);
+      }
+
+      .music-control {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 100;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+      }
+      .music-control:hover {
+        background: var(--primary);
+      }
+      .music-bars {
+        display: flex;
+        align-items: flex-end;
+        height: 20px;
+        gap: 3px;
+      }
+      .bar {
+        width: 4px;
+        background: white;
+        height: 3px;
+        transition: height 0.2s;
+      }
+      .bar.animating {
+        animation: equalizer 1s infinite ease-in-out;
+      }
+      .bar:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .bar:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .bar:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+
+      /* MODAL */
+      .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        background: #1e293b;
+        padding: 2rem;
+        border-radius: 15px;
+        border: 1px solid var(--primary);
+        z-index: 2000;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        text-align: center;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        max-width: 90%;
+      }
+      .modal.active {
+        opacity: 1;
+        pointer-events: all;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      .overlay-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .overlay-bg.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      /* ANIMATIONS */
+      @keyframes blink {
+        50% {
+          opacity: 0.5;
+        }
+      }
+      @keyframes pulse-ring {
+        0% {
+          box-shadow: 0 0 0 0 rgba(128, 0, 0, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 15px rgba(128, 0, 0, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(128, 0, 0, 0);
+        }
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(20px);
+        }
+        50% {
+          transform: translateY(0px);
+        }
+        100% {
+          transform: translateY(20px);
+        }
+      }
+      @keyframes equalizer {
+        0% {
+          height: 20%;
+        }
+        50% {
+          height: 100%;
+        }
+        100% {
+          height: 20%;
+        }
+      }
+      @keyframes shake {
+        0% {
+          transform: translate(1px, 1px) rotate(0deg);
+        }
+        25% {
+          transform: translate(-3px, 0px) rotate(1deg);
+        }
+        50% {
+          transform: translate(-1px, 2px) rotate(-1deg);
+        }
+        75% {
+          transform: translate(3px, 1px) rotate(-1deg);
+        }
+        100% {
+          transform: translate(1px, -2px) rotate(-1deg);
+        }
+      }
+      .shake {
+        animation: shake 0.5s;
+      }
+
+      /* Responsive Fixes */
+      @media (max-width: 768px) {
+        .script-font {
+          font-size: 2rem;
+        }
+        .letter-container {
+          padding: 1.5rem;
+        }
+        .letter-container::before {
+          font-size: 5rem;
+          top: -30px;
+        }
+        .phone-screen {
+          width: 90%;
+          max-width: 350px;
+          height: 550px;
+        }
+        .contact-name {
+          font-size: 1.5rem;
+        }
+        .avatar-container {
+          width: 120px;
+          height: 120px;
+        }
+      }
+
+      @media (max-width: 350px) {
+        .phone-screen {
+          height: 500px;
+          padding: 1rem;
+        }
+        .avatar-container {
+          width: 100px;
+          height: 100px;
+        }
+        .call-btn {
+          width: 60px;
+          height: 60px;
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="star-canvas"></canvas>
+
+    <audio id="bg-music" loop>
+      <source src="you!.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+
+    <div id="game-overlay" class="flex-center">
+      <div class="phone-screen" id="phone-screen">
+        <div class="phone-header">
+          <div class="contact-info">
+            <div class="contact-name">Ibu Ketua 👑</div>
+            <div class="contact-status">Calling Mobile...</div>
+          </div>
+
+          <div class="avatar-container">
+            <img src="acit.jpg" alt="Acit Avatar" id="acit-avatar" />
+          </div>
+        </div>
+
+        <div class="phone-controls">
+          <p class="game-hint">She is sleeping! Spam the button to wake her up!</p>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end">
+            <span style="font-size: 0.7rem; color: #94a3b8">Sleepiness Level</span>
+            <span id="level-text" style="font-size: 0.7rem; color: #cbd5e1">100%</span>
+          </div>
+
+          <div class="progress-container">
+            <div class="progress-bar" id="wake-progress"></div>
+          </div>
+
+          <div class="btn-wrapper">
+            <button class="call-btn" style="background: #ef4444" id="decline-btn"><i class="fa-solid fa-phone-slash"></i></button>
+            <button class="call-btn" id="wake-btn"><i class="fa-solid fa-phone"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="main-content" class="container hidden">
+      <nav style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0">
+        <div class="script-font" style="font-size: 1.5rem">Strong Lil Lady Acit</div>
+        <div style="font-size: 0.9rem; color: #94a3b8">Est. 2025</div>
+      </nav>
+
+      <section class="hero-section">
+        <h1 class="script-font" style="margin-bottom: 1rem">Happy New Year 2026</h1>
+        <h2 class="gradient-text" style="font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 2rem">Astrid Helviana</h2>
+
+        <div class="typewriter" id="typewriter-text"></div>
+
+        <div class="profile-card">
+          <div style="font-size: 3rem; margin-bottom: 1rem">🧚‍♀️✨</div>
+          <h3 style="margin-bottom: 1rem">The Pocket-Sized Hulk</h3>
+          <div style="display: flex; flex-wrap: wrap; justify-content: center">
+            <span class="tag">#IbuKetua</span>
+            <span class="tag">#Dancer</span>
+            <span class="tag">#AyamGeprekLover</span>
+            <span class="tag">#ChaoticGood</span>
+            <span class="tag">#180cm++(InSpirit)</span>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: #cbd5e1; font-style: italic">"Social chameleon by day, Vampire (insomniac) by night."</p>
+        </div>
+      </section>
+
+      <section class="letter-container">
+        <h3 style="text-align: center; margin-bottom: 2rem; color: var(--gold)">Dear Acit,</h3>
+
+        <div class="letter-text">
+          <p>Hai, <span class="highlight">Ibu Ketua</span>. (Jangan marah dipanggil ibu ya, ini edisi spesial tahun baru).</p>
+          <br />
+          <p>
+            Pertama-tama, terima kasih. Terima kasih sudah bertahan melewati tahun 2025 yang aku tahu berat banget buat kamu. Dari ngurusin proker BEM yang bikin pusing, drama organisasi, sampai tugas kuliah yang numpuk. Tapi kamu, dengan
+            tubuh *pocket-sized* itu, punya semangat kayak Hulk yang siap ngegebrak meja kalau ada yang nggak beres. Aku bangga banget sama kamu.
+          </p>
+          <br />
+          <p>
+            Aku tau kamu sering bilang kamu itu "Social Chameleon", menyesuaikan diri di mana pun kamu berada. Tapi aku bersyukur, ketika sama aku, kamu memilih untuk menjadi <span class="highlight">Acit yang asli</span>. Acit yang random,
+            yang manja, yang kadang *chaotic*, yang suka stiker aneh-aneh. *No facade, just you.* Dan itu, bagi aku, adalah versi terbaik dari Astrid Helviana.
+          </p>
+          <br />
+          <p>
+            Di tahun 2026 ini, aku nggak minta kamu untuk berubah. Tetaplah jadi Acit yang suka dance, yang suka anime, yang random. Cuma satu pintaku: <b>Don't bear the weight of the world alone.</b> Kalau dunia terasa terlalu berat untuk
+            dipikul sendirian, ingat, ada aku. Aku bakal jadi tempat kamu istirahat, jadi pendengar semua ceritamu, dan jadi partner kamu tumbuh.
+          </p>
+          <br />
+          <p>Kalau kamu sedih, aku ada. Kalau kamu senang, aku ada. Kalau kamu laper... tenang, Chef Syuby siap masakin <span class="easter-egg" onclick="triggerGeprek()">Ayam Geprek</span> spesial kapan aja.</p>
+          <br />
+          <p>Let's grow together this year. Less insecurity, more confidence. You are stronger than you think, prettier than you realize, and more special to me than words can say.</p>
+          <br />
+          <p style="text-align: center; margin-top: 3rem; font-family: var(--font-script); font-size: 1.8rem">I'll be here, always.</p>
+          <p style="text-align: center; font-weight: bold; margin-top: 0.5rem">- Syuby (a.k.a Vampire Bekasi) 🧛‍♂️</p>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="triggerSecret()"><i class="fa-solid fa-moon"></i> Rahasia Malam</button>
+        </div>
+      </section>
+
+      <footer style="margin-top: 5rem; text-align: center; padding: 2rem; color: #64748b; font-size: 0.8rem">
+        <p>Developed with <span style="color: red">&hearts;</span> and a lot of patience (waiting for you to reply).</p>
+        <p>P.S. Ada <span class="easter-egg" onclick="triggerMinion()">🍌</span> tersembunyi di sini.</p>
+      </footer>
+    </div>
+
+    <div class="music-control" id="music-btn" onclick="toggleMusic()">
+      <div class="music-bars">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+
+    <div class="overlay-bg" id="overlay-bg" onclick="closeModal()"></div>
+
+    <div class="modal" id="geprek-modal">
+      <h2 style="color: var(--gold)">🍗 Kupon Ayam Geprek</h2>
+      <p style="margin: 1rem 0">Kupon ini berlaku seumur hidup. Dapat ditukarkan ke Chef Syuby kapan saja saat Acit kelaparan atau badmood.</p>
+      <div style="font-size: 4rem">🌶️🥵🍚</div>
+      <button class="btn btn-secondary" style="margin: 1rem auto" onclick="closeModal()">Siap, Chef!</button>
+    </div>
+
+    <div class="modal" id="minion-modal">
+      <h2>BANANA!!</h2>
+      <img src="https://media.giphy.com/media/1uPiL9Amv5zkk/giphy.gif" alt="Minion" style="width: 200px; border-radius: 10px; margin: 1rem 0" />
+      <p>Acit kalau lagi random mirip ini. Lucu. 🤏</p>
+      <button class="btn btn-secondary" style="margin: 1rem auto" onclick="closeModal()">Hehe</button>
+    </div>
+
+    <div class="modal" id="secret-modal">
+      <h2 style="color: #ec4899">For the Strong Lil Lady</h2>
+      <p style="margin: 1rem 0; font-style: italic">"I would rather be awkward with you than not."</p>
+      <p>Janji ya, tahun ini jangan sering-sering mendem sedih sendirian? Hulk juga butuh istirahat. Vampire Bekasi siap dengerin curhatan jam 2 pagi.</p>
+      <div style="font-size: 3rem; margin-top: 1rem">🦇🌑</div>
+      <button class="btn btn-secondary" style="margin: 1rem auto" onclick="closeModal()">Janji 🤙</button>
+    </div>
+
+    <script>
+      // --- 1. CONFIG & STATE ---
+      let wakeProgress = 0;
+      let isAwake = false;
+      const audio = document.getElementById('bg-music');
+      let isPlaying = false;
+
+      // --- 2. MUSIC CONTROLS ---
+      function toggleMusic() {
+        if (audio.paused) {
+          audio.play();
+          document.querySelectorAll('.bar').forEach((b) => b.classList.add('animating'));
+          isPlaying = true;
+        } else {
+          audio.pause();
+          document.querySelectorAll('.bar').forEach((b) => b.classList.remove('animating'));
+          isPlaying = false;
+        }
+      }
+
+      // --- 3. MINIGAME LOGIC ---
+      const wakeBtn = document.getElementById('wake-btn');
+      const declineBtn = document.getElementById('decline-btn');
+      const phoneScreen = document.getElementById('phone-screen');
+      const progressBar = document.getElementById('wake-progress');
+      const levelText = document.getElementById('level-text');
+      const overlay = document.getElementById('game-overlay');
+      const mainContent = document.getElementById('main-content');
+
+      // Vibration function (works on android)
+      function vibrate(ms) {
+        if (navigator.vibrate) {
+          navigator.vibrate(ms);
+        }
+      }
+
+      declineBtn.addEventListener('click', () => {
+        alert('Ih, kok dimatiin? Angkat dong Ibu Ketua! 😤');
+        vibrate(200);
+      });
+
+      wakeBtn.addEventListener('click', () => {
+        if (isAwake) return;
+
+        // Increment progress
+        wakeProgress += 10; // 10 clicks to wake up
+        progressBar.style.width = wakeProgress + '%';
+
+        // Shake effect
+        phoneScreen.classList.remove('shake');
+        void phoneScreen.offsetWidth; // trigger reflow
+        phoneScreen.classList.add('shake');
+
+        vibrate(50);
+
+        // Logic Text Change based on progress
+        const statusText = document.querySelector('.contact-status');
+        if (wakeProgress < 30) statusText.innerText = 'Calling Mobile...';
+        else if (wakeProgress < 60) statusText.innerText = 'Ngulet dikit...';
+        else if (wakeProgress < 90) statusText.innerText = 'Mencari nyawa...';
+        else statusText.innerText = 'Loading kesadaran...';
+
+        // Level text update (reverse logic: awake means less sleepy)
+        let sleepiness = 100 - wakeProgress;
+        levelText.innerText = sleepiness + '% Sleepy';
+
+        // Success
+        if (wakeProgress >= 100) {
+          isAwake = true;
+          statusText.innerText = 'Connected!';
+          statusText.style.color = '#22c55e';
+          levelText.innerText = 'Awake!';
+
+          setTimeout(() => {
+            // PLAY LOCAL MUSIC HERE
+            audio
+              .play()
+              .then(() => {
+                document.querySelectorAll('.bar').forEach((b) => b.classList.add('animating'));
+                isPlaying = true;
+              })
+              .catch((e) => console.log('Audio play failed (browser policy):', e));
+
+            // Transition
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+              overlay.style.display = 'none';
+              mainContent.classList.remove('hidden');
+              mainContent.style.opacity = '1';
+              startTypewriter();
+              createFireworks();
+            }, 1000);
+          }, 800);
+        }
+      });
+
+      // --- 4. TYPEWRITER EFFECT ---
+      const textToType = ['Hi, Acit.', 'Welcome to 2026.', "Let's make this year ours."];
+
+      function startTypewriter() {
+        const container = document.getElementById('typewriter-text');
+        let lineIndex = 0;
+        let charIndex = 0;
+
+        function type() {
+          if (lineIndex < textToType.length) {
+            if (charIndex < textToType[lineIndex].length) {
+              container.innerHTML = textToType[lineIndex].substring(0, charIndex + 1) + '<span class="highlight">|</span>';
+              charIndex++;
+              setTimeout(type, 100);
+            } else {
+              // Line finished
+              setTimeout(() => {
+                container.innerHTML = textToType[lineIndex]; // remove cursor
+                lineIndex++;
+                charIndex = 0;
+                container.innerHTML += '<br>'; // new line
+                setTimeout(type, 500);
+              }, 1000);
+            }
+          }
+        }
+        type();
+      }
+
+      // --- 5. EASTER EGG TRIGGERS ---
+      function openModal(id) {
+        document.getElementById('overlay-bg').classList.add('active');
+        document.getElementById(id).classList.add('active');
+      }
+
+      function closeModal() {
+        document.querySelectorAll('.modal').forEach((m) => m.classList.remove('active'));
+        document.getElementById('overlay-bg').classList.remove('active');
+      }
+
+      function triggerGeprek() {
+        openModal('geprek-modal');
+      }
+      function triggerMinion() {
+        openModal('minion-modal');
+      }
+      function triggerSecret() {
+        openModal('secret-modal');
+      }
+
+      // --- 6. CANVAS BACKGROUND (STARS) ---
+      const canvas = document.getElementById('star-canvas');
+      const ctx = canvas.getContext('2d');
+      let width,
+        height,
+        stars = [];
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+
+      class Star {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2;
+          this.speedX = (Math.random() - 0.5) * 0.5;
+          this.speedY = (Math.random() - 0.5) * 0.5;
+          this.brightness = Math.random();
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          this.brightness += (Math.random() - 0.5) * 0.1;
+          if (this.brightness > 1) this.brightness = 1;
+          if (this.brightness < 0) this.brightness = 0;
+          if (this.x < 0) this.x = width;
+          if (this.x > width) this.x = 0;
+          if (this.y < 0) this.y = height;
+          if (this.y > height) this.y = 0;
+        }
+        draw() {
+          ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function initStars() {
+        resize();
+        for (let i = 0; i < 150; i++) stars.push(new Star());
+        animateStars();
+      }
+
+      function animateStars() {
+        ctx.clearRect(0, 0, width, height);
+        stars.forEach((star) => {
+          star.update();
+          star.draw();
+        });
+        requestAnimationFrame(animateStars);
+      }
+
+      window.addEventListener('resize', resize);
+      initStars();
+
+      // --- 7. FIREWORKS EFFECT ---
+      function createFireworks() {
+        const colors = ['#800000', '#fbbf24', '#ec4899', '#ffffff'];
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement('div');
+          particle.style.position = 'fixed';
+          particle.style.left = '50%';
+          particle.style.top = '50%';
+          particle.style.width = '5px';
+          particle.style.height = '5px';
+          particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          particle.style.borderRadius = '50%';
+          particle.style.pointerEvents = 'none';
+          document.body.appendChild(particle);
+
+          const angle = Math.random() * Math.PI * 2;
+          const velocity = 5 + Math.random() * 10;
+          const tx = Math.cos(angle) * velocity * 20;
+          const ty = Math.sin(angle) * velocity * 20;
+
+          particle.animate(
+            [
+              { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+              { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 },
+            ],
+            { duration: 1000 + Math.random() * 1000, easing: 'cubic-bezier(0, .9, .57, 1)', delay: Math.random() * 200 }
+          ).onfinish = () => particle.remove();
+        }
+      }
+
+      console.log('Developed by Syuby for Acit.');
+    </script>
+  </body>
+</html>
