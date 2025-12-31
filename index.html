@@ -4,18 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Happy New Year 2026, Acit!</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Sacramento&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Sacramento&family=Space+Mono&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-      /* * CSS VARIABLES & RESET */
+      /* --- CSS VARIABLES & THEME SETUP --- */
       :root {
-        --primary: #800000;
-        --primary-light: #a52a2a;
+        --primary: #800000; /* Brick Red Nails */
+        --primary-glow: #ff4d4d;
         --dark: #0f172a;
         --darker: #020617;
+        --card-bg: rgba(30, 41, 59, 0.7);
         --light: #f8fafc;
         --gold: #fbbf24;
         --accent: #ec4899;
@@ -24,6 +27,7 @@
         --font-main: 'Inter', sans-serif;
         --font-serif: 'Playfair Display', serif;
         --font-script: 'Sacramento', cursive;
+        --font-mono: 'Space Mono', monospace;
       }
 
       * {
@@ -39,21 +43,23 @@
         overflow-x: hidden;
         min-height: 100vh;
         position: relative;
+        scroll-behavior: smooth;
       }
 
-      /* SCROLLBAR */
+      /* Scrollbar Customization */
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 10px;
       }
       ::-webkit-scrollbar-track {
         background: var(--darker);
       }
       ::-webkit-scrollbar-thumb {
         background: var(--primary);
-        border-radius: 4px;
+        border-radius: 5px;
+        border: 2px solid var(--darker);
       }
 
-      /* CANVAS BACKGROUND */
+      /* Background Elements */
       #star-canvas {
         position: fixed;
         top: 0;
@@ -64,7 +70,27 @@
         opacity: 0.8;
       }
 
-      /* UTILITIES */
+      .gradient-orb {
+        position: fixed;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(128, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -1;
+        animation: floatOrb 10s infinite ease-in-out;
+      }
+      .orb-1 {
+        top: -10%;
+        left: -10%;
+      }
+      .orb-2 {
+        bottom: -10%;
+        right: -10%;
+        background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+      }
+
+      /* --- UTILITIES --- */
       .hidden {
         display: none !important;
         opacity: 0;
@@ -75,18 +101,18 @@
         justify-content: center;
         align-items: center;
       }
-      .text-center {
-        text-align: center;
-      }
       .container {
-        max-width: 800px;
+        max-width: 900px;
         margin: 0 auto;
         padding: 2rem;
         position: relative;
         z-index: 10;
       }
+      .spacer {
+        height: 100px;
+      }
 
-      /* TYPOGRAPHY */
+      /* Typography */
       h1,
       h2,
       h3 {
@@ -95,373 +121,416 @@
       }
       .script-font {
         font-family: var(--font-script);
-        font-size: 2.5rem;
+        font-size: 3rem;
         color: var(--gold);
       }
       .highlight {
-        color: var(--primary);
+        color: var(--primary-glow);
         font-weight: bold;
+        text-shadow: 0 0 10px rgba(128, 0, 0, 0.5);
       }
+      .mono {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
       .gradient-text {
         background: linear-gradient(to right, #fff, #fbbf24);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
 
-      /* * SECTION 1: MINIGAME (WAKE UP ACIT) */
+      /* --- SECTION 1: GAME SCREEN (LOCK SCREEN) --- */
       #game-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        z-index: 999;
+        background: rgba(2, 6, 23, 0.98);
+        z-index: 9999;
         flex-direction: column;
-        transition: opacity 1s ease;
+        transition: opacity 1.5s ease-in-out;
+        backdrop-filter: blur(10px);
       }
 
-      .phone-screen {
-        width: 320px;
-        height: 600px; /* Sedikit lebih tinggi agar lega */
-        max-height: 90vh; /* Responsive height */
-        background: linear-gradient(180deg, #1e293b, #0f172a);
-        border: 4px solid #334155;
-        border-radius: 30px;
-        padding: 2rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-evenly; /* Distribusi elemen merata */
-        box-shadow: 0 0 50px rgba(128, 0, 0, 0.3);
+      .phone-frame {
+        width: 340px;
+        height: 650px;
+        background: #0f172a;
+        border: 8px solid #334155;
+        border-radius: 40px;
         position: relative;
+        box-shadow: 0 0 60px rgba(128, 0, 0, 0.2);
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
 
-      /* Wrapper untuk bagian atas HP (Nama & Foto) */
-      .phone-header {
+      .notch {
+        width: 120px;
+        height: 25px;
+        background: #000;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        z-index: 20;
+      }
+
+      .call-screen {
+        padding: 3rem 1.5rem;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 100%;
-        gap: 1.5rem; /* Jarak antara teks dan foto */
+        justify-content: space-between;
+        background: linear-gradient(180deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 1)), url('https://www.transparenttextures.com/patterns/stardust.png');
       }
 
-      .avatar-container {
-        width: 140px; /* Sedikit lebih besar */
+      .caller-img-box {
+        width: 140px;
         height: 140px;
         border-radius: 50%;
-        border: 4px solid var(--primary);
-        overflow: hidden;
+        border: 3px solid var(--primary);
+        padding: 5px;
         position: relative;
-        animation: pulse-ring 2s infinite;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
       }
 
-      .avatar-container img {
+      .caller-img-box::after {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 50%;
+        border: 2px dashed rgba(251, 191, 36, 0.5);
+        animation: spin 10s linear infinite;
+      }
+
+      .caller-img {
         width: 100%;
         height: 100%;
+        border-radius: 50%;
         object-fit: cover;
       }
 
-      .contact-info {
-        text-align: center;
-      }
-      .contact-name {
+      .call-info h2 {
         font-size: 1.8rem;
-        font-weight: 700;
-        letter-spacing: 0.5px;
+        margin-bottom: 5px;
       }
-      .contact-status {
-        font-size: 1rem;
+      .call-status {
         color: #94a3b8;
-        margin-top: 5px;
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
         animation: blink 1.5s infinite;
       }
 
-      /* Wrapper untuk bagian bawah HP (Progress & Tombol) */
-      .phone-controls {
+      .sleep-meter {
         width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        margin: 1rem 0;
       }
-
-      .progress-container {
+      .progress-bg {
         width: 100%;
+        height: 8px;
         background: #334155;
-        height: 12px;
-        border-radius: 6px;
+        border-radius: 10px;
         overflow: hidden;
       }
-      .progress-bar {
+      .progress-fill {
         width: 0%;
         height: 100%;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        transition: width 0.1s linear;
+        background: var(--gold);
+        transition: width 0.1s;
+        box-shadow: 0 0 10px var(--gold);
       }
 
-      .btn-wrapper {
+      .call-actions {
         display: flex;
-        justify-content: space-around;
-        align-items: center;
-        margin-top: 1rem;
+        gap: 2rem;
+        width: 100%;
+        justify-content: center;
       }
-
-      .call-btn {
-        width: 75px;
-        height: 75px;
+      .action-btn {
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
-        background: #22c55e;
-        color: white;
-        font-size: 2rem;
         border: none;
+        color: white;
+        font-size: 1.5rem;
         cursor: pointer;
-        animation: bounce 1s infinite;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-        transition: transform 0.1s;
+        transition: transform 0.2s;
       }
-      .call-btn:active {
+      .btn-decline {
+        background: #ef4444;
+      }
+      .btn-accept {
+        background: #22c55e;
+        animation: bounce 1.5s infinite;
+      }
+      .action-btn:active {
         transform: scale(0.9);
       }
-      .game-hint {
-        font-size: 0.85rem;
-        color: #cbd5e1;
-        text-align: center;
-        opacity: 0.8;
-      }
 
-      /* * SECTION 2: MAIN CONTENT */
+      /* --- SECTION 2: MAIN CONTENT (FADE IN) --- */
       #main-content {
         opacity: 0;
         transition: opacity 2s ease;
-        padding-bottom: 100px;
       }
 
-      .hero-section {
-        min-height: 80vh;
+      /* Hero Section */
+      .hero {
+        min-height: 90vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         text-align: center;
-        padding-top: 4rem;
       }
 
-      .profile-card {
-        background: var(--glass);
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--glass-border);
-        padding: 2rem;
-        border-radius: 20px;
-        margin-top: 2rem;
-        max-width: 500px;
-        transform: translateY(20px);
-        animation: float 6s ease-in-out infinite;
-      }
-
-      .tag {
-        display: inline-block;
-        padding: 5px 12px;
-        background: rgba(128, 0, 0, 0.2);
-        border: 1px solid var(--primary);
+      .hero-badge {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid var(--gold);
+        color: var(--gold);
+        padding: 5px 15px;
         border-radius: 20px;
         font-size: 0.8rem;
-        margin: 5px;
-        color: #fac7c7;
+        margin-bottom: 1rem;
+        letter-spacing: 1px;
       }
 
-      .typewriter {
-        display: inline-block;
-        font-family: var(--font-serif);
-        font-size: 1.2rem;
-        line-height: 1.6;
-        min-height: 60px;
-        margin-bottom: 2rem;
-        color: #e2e8f0;
+      .hero-title {
+        font-size: clamp(3rem, 5vw, 5rem);
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        background: linear-gradient(to bottom, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
-      /* * SECTION 3: THE LETTER */
-      .letter-container {
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 3rem;
-        border-radius: 10px;
-        margin-top: 4rem;
+      /* Cards & Grids */
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 3rem 0;
+      }
+
+      .glass-card {
+        background: var(--card-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: transform 0.3s, box-shadow 0.3s;
         position: relative;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-      }
-      .letter-container::before {
-        content: '"';
-        position: absolute;
-        top: -20px;
-        left: 20px;
-        font-size: 8rem;
-        font-family: var(--font-serif);
-        color: var(--primary);
-        opacity: 0.3;
-      }
-      .letter-text {
-        font-size: 1.1rem;
-        line-height: 1.8;
-        color: #cbd5e1;
-        text-align: justify;
-        margin-bottom: 1.5rem;
+        overflow: hidden;
       }
 
-      /* BUTTONS */
-      .btn-group {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 2rem;
+      .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border-color: var(--primary);
       }
-      .btn {
-        padding: 12px 24px;
-        border-radius: 30px;
-        border: none;
+
+      /* Trait Cards (Starter Pack) */
+      .trait-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+      .trait-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: var(--gold);
+      }
+      .trait-desc {
+        font-size: 0.9rem;
+        color: #cbd5e1;
+        line-height: 1.5;
+      }
+
+      /* The Letter */
+      .letter-wrapper {
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        padding: 3rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        position: relative;
+      }
+
+      .paper-clip {
+        position: absolute;
+        top: -15px;
+        right: 2rem;
+        font-size: 3rem;
+        color: #94a3b8;
+        transform: rotate(45deg);
+      }
+
+      .letter-content p {
+        margin-bottom: 1.5rem;
+        line-height: 1.8;
+        color: #e2e8f0;
+        font-size: 1.05rem;
+      }
+
+      /* Vouchers */
+      .voucher {
+        border: 2px dashed #475569;
+        background: rgba(15, 23, 42, 0.5);
         cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        font-family: var(--font-main);
+        text-align: center;
+      }
+      .voucher.claimed {
+        border-color: var(--primary);
+        background: rgba(128, 0, 0, 0.1);
+      }
+      .voucher-code {
+        background: #000;
+        color: var(--gold);
+        padding: 5px;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        border-radius: 5px;
+        margin-top: 10px;
+        display: inline-block;
+      }
+
+      /* Checklist */
+      .bucket-list {
+        list-style: none;
+        text-align: left;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .bucket-item {
+        background: rgba(255, 255, 255, 0.03);
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
-        gap: 8px;
-      }
-      .btn-primary {
-        background: var(--primary);
-        color: white;
-        box-shadow: 0 4px 15px rgba(128, 0, 0, 0.4);
-      }
-      .btn-primary:hover {
-        background: #600000;
-        transform: translateY(-2px);
-      }
-      .btn-secondary {
-        background: transparent;
-        border: 1px solid var(--light);
-        color: var(--light);
-      }
-      .btn-secondary:hover {
-        background: var(--light);
-        color: var(--dark);
-      }
-
-      /* EASTER EGGS & MUSIC */
-      .easter-egg {
+        gap: 15px;
         cursor: pointer;
-        transition: transform 0.2s;
-        display: inline-block;
+        transition: background 0.2s;
       }
-      .easter-egg:hover {
-        transform: scale(1.2) rotate(10deg);
+      .bucket-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .check-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--gold);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .bucket-item.checked .check-box::after {
+        content: '✔';
+        font-size: 0.8rem;
+        color: var(--gold);
+      }
+      .bucket-item.checked span {
+        text-decoration: line-through;
+        color: #64748b;
       }
 
-      .music-control {
+      /* Music Player Widget */
+      .music-widget {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(5px);
-        padding: 10px;
-        border-radius: 50%;
-        cursor: pointer;
-        z-index: 100;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        width: 50px;
-        height: 50px;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
         display: flex;
         align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
+        gap: 15px;
+        z-index: 100;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s;
       }
-      .music-control:hover {
+      .music-widget:hover {
+        transform: scale(1.05);
+        border-color: var(--primary);
+      }
+      .equalizer {
+        display: flex;
+        gap: 3px;
+        height: 15px;
+        align-items: flex-end;
+      }
+      .eq-bar {
+        width: 3px;
+        background: var(--accent);
+        animation: eq 1s infinite ease-in-out;
+      }
+      .eq-bar:nth-child(2) {
+        animation-delay: 0.2s;
+        background: var(--gold);
+      }
+      .eq-bar:nth-child(3) {
+        animation-delay: 0.4s;
         background: var(--primary);
       }
-      .music-bars {
-        display: flex;
-        align-items: flex-end;
-        height: 20px;
-        gap: 3px;
-      }
-      .bar {
-        width: 4px;
-        background: white;
-        height: 3px;
-        transition: height 0.2s;
-      }
-      .bar.animating {
-        animation: equalizer 1s infinite ease-in-out;
-      }
-      .bar:nth-child(1) {
-        animation-delay: 0.1s;
-      }
-      .bar:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .bar:nth-child(3) {
-        animation-delay: 0.3s;
-      }
 
-      /* MODAL */
-      .modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.8);
-        background: #1e293b;
-        padding: 2rem;
-        border-radius: 15px;
-        border: 1px solid var(--primary);
-        z-index: 2000;
-        opacity: 0;
-        pointer-events: none;
-        transition: all 0.3s ease;
-        text-align: center;
-        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-        max-width: 90%;
-      }
-      .modal.active {
-        opacity: 1;
-        pointer-events: all;
-        transform: translate(-50%, -50%) scale(1);
-      }
-      .overlay-bg {
+      /* Modals */
+      .modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 1999;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 5000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s;
       }
-      .overlay-bg.active {
+      .modal-box {
+        background: #1e293b;
+        padding: 2rem;
+        border-radius: 20px;
+        max-width: 90%;
+        width: 400px;
+        text-align: center;
+        border: 1px solid var(--primary);
+        transform: translateY(20px);
+        transition: transform 0.3s;
+      }
+      .modal-overlay.active {
         opacity: 1;
         pointer-events: all;
       }
+      .modal-overlay.active .modal-box {
+        transform: translateY(0);
+      }
 
-      /* ANIMATIONS */
+      /* Animations */
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
       @keyframes blink {
         50% {
           opacity: 0.5;
-        }
-      }
-      @keyframes pulse-ring {
-        0% {
-          box-shadow: 0 0 0 0 rgba(128, 0, 0, 0.7);
-        }
-        70% {
-          box-shadow: 0 0 0 15px rgba(128, 0, 0, 0);
-        }
-        100% {
-          box-shadow: 0 0 0 0 rgba(128, 0, 0, 0);
         }
       }
       @keyframes bounce {
@@ -473,412 +542,481 @@
           transform: scale(1.1);
         }
       }
-      @keyframes float {
-        0% {
-          transform: translateY(20px);
+      @keyframes floatOrb {
+        0%,
+        100% {
+          transform: translate(0, 0);
         }
         50% {
-          transform: translateY(0px);
-        }
-        100% {
-          transform: translateY(20px);
+          transform: translate(20px, -20px);
         }
       }
-      @keyframes equalizer {
-        0% {
+      @keyframes eq {
+        0%,
+        100% {
           height: 20%;
         }
         50% {
           height: 100%;
         }
-        100% {
-          height: 20%;
-        }
       }
       @keyframes shake {
         0% {
-          transform: translate(1px, 1px) rotate(0deg);
+          transform: translateX(0);
         }
         25% {
-          transform: translate(-3px, 0px) rotate(1deg);
-        }
-        50% {
-          transform: translate(-1px, 2px) rotate(-1deg);
+          transform: translateX(-5px);
         }
         75% {
-          transform: translate(3px, 1px) rotate(-1deg);
+          transform: translateX(5px);
         }
         100% {
-          transform: translate(1px, -2px) rotate(-1deg);
+          transform: translateX(0);
         }
       }
-      .shake {
-        animation: shake 0.5s;
+
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 1s ease;
+      }
+      .scroll-reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
       }
 
-      /* Responsive Fixes */
       @media (max-width: 768px) {
         .script-font {
-          font-size: 2rem;
+          font-size: 2.2rem;
         }
-        .letter-container {
-          padding: 1.5rem;
+        .hero-title {
+          font-size: 2.5rem;
         }
-        .letter-container::before {
-          font-size: 5rem;
-          top: -30px;
-        }
-        .phone-screen {
-          width: 90%;
-          max-width: 350px;
-          height: 550px;
-        }
-        .contact-name {
-          font-size: 1.5rem;
-        }
-        .avatar-container {
-          width: 120px;
-          height: 120px;
-        }
-      }
-
-      @media (max-width: 350px) {
-        .phone-screen {
-          height: 500px;
-          padding: 1rem;
-        }
-        .avatar-container {
-          width: 100px;
-          height: 100px;
-        }
-        .call-btn {
-          width: 60px;
-          height: 60px;
-          font-size: 1.5rem;
+        .call-actions {
+          gap: 1rem;
         }
       }
     </style>
   </head>
   <body>
     <canvas id="star-canvas"></canvas>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
 
     <audio id="bg-music" loop>
       <source src="you!.mp3" type="audio/mpeg" />
-      Your browser does not support the audio element.
     </audio>
 
     <div id="game-overlay" class="flex-center">
-      <div class="phone-screen" id="phone-screen">
-        <div class="phone-header">
-          <div class="contact-info">
-            <div class="contact-name">Ibu Ketua 👑</div>
-            <div class="contact-status">Calling Mobile...</div>
+      <div class="phone-frame">
+        <div class="notch"></div>
+        <div class="call-screen">
+          <div style="text-align: center; margin-top: 2rem">
+            <div class="caller-img-box" style="margin: 0 auto 1.5rem auto">
+              <img src="acit.jpg" alt="Acit" class="caller-img" id="caller-img" />
+            </div>
+            <div class="call-info">
+              <h2 class="script-font" style="font-size: 2.5rem">Ibu Ketua 👑</h2>
+              <p class="contact-status" id="call-status">Connecting...</p>
+            </div>
           </div>
 
-          <div class="avatar-container">
-            <img src="acit.jpg" alt="Acit Avatar" id="acit-avatar" />
-          </div>
-        </div>
-
-        <div class="phone-controls">
-          <p class="game-hint">She is sleeping! Spam the button to wake her up!</p>
-          <div style="display: flex; justify-content: space-between; align-items: flex-end">
-            <span style="font-size: 0.7rem; color: #94a3b8">Sleepiness Level</span>
-            <span id="level-text" style="font-size: 0.7rem; color: #cbd5e1">100%</span>
+          <div style="width: 100%; text-align: center">
+            <p class="mono" style="font-size: 0.7rem; margin-bottom: 5px">WAKE UP PROTOCOL: <span id="percent">0%</span></p>
+            <div class="progress-bg">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px; font-style: italic">"Spam tombol hijau. Dia tidurnya ngebo banget."</p>
           </div>
 
-          <div class="progress-container">
-            <div class="progress-bar" id="wake-progress"></div>
-          </div>
-
-          <div class="btn-wrapper">
-            <button class="call-btn" style="background: #ef4444" id="decline-btn"><i class="fa-solid fa-phone-slash"></i></button>
-            <button class="call-btn" id="wake-btn"><i class="fa-solid fa-phone"></i></button>
+          <div class="call-actions">
+            <button class="action-btn btn-decline" id="btn-decline">
+              <i class="fa-solid fa-phone-slash"></i>
+            </button>
+            <button class="action-btn btn-accept" id="btn-wake">
+              <i class="fa-solid fa-phone"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <div id="main-content" class="container hidden">
-      <nav style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0">
-        <div class="script-font" style="font-size: 1.5rem">Strong Lil Lady Acit</div>
-        <div style="font-size: 0.9rem; color: #94a3b8">Est. 2025</div>
+      <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem">
+        <div class="mono" style="color: var(--gold)">SYUBY & ACIT</div>
+        <div style="font-size: 1.2rem">✨</div>
       </nav>
 
-      <section class="hero-section">
-        <h1 class="script-font" style="margin-bottom: 1rem">Happy New Year 2026</h1>
-        <h2 class="gradient-text" style="font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 2rem">Astrid Helviana</h2>
+      <section class="hero scroll-reveal">
+        <span class="hero-badge">CHAPTER: 2026</span>
+        <h1 class="hero-title">Happy New Year,<br /><span class="script-font" style="color: var(--primary-glow); font-size: 1.2em">Acit.</span></h1>
 
-        <div class="typewriter" id="typewriter-text"></div>
+        <div style="margin: 2rem 0; font-family: var(--font-serif); font-size: 1.2rem; min-height: 30px" id="typewriter"></div>
 
-        <div class="profile-card">
-          <div style="font-size: 3rem; margin-bottom: 1rem">🧚‍♀️✨</div>
-          <h3 style="margin-bottom: 1rem">The Pocket-Sized Hulk</h3>
-          <div style="display: flex; flex-wrap: wrap; justify-content: center">
-            <span class="tag">#IbuKetua</span>
-            <span class="tag">#Dancer</span>
-            <span class="tag">#AyamGeprekLover</span>
-            <span class="tag">#ChaoticGood</span>
-            <span class="tag">#180cm++(InSpirit)</span>
+        <div class="glass-card" style="max-width: 600px; margin-top: 1rem">
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 1rem">
+            <div style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e"></div>
+            <span class="mono">CURRENT STATUS</span>
           </div>
-          <p style="margin-top: 1rem; font-size: 0.9rem; color: #cbd5e1; font-style: italic">"Social chameleon by day, Vampire (insomniac) by night."</p>
+          <p style="font-style: italic; color: #cbd5e1">"Probably overthinking proker, dancing in her room, or craving Ayam Geprek right now."</p>
         </div>
       </section>
 
-      <section class="letter-container">
-        <h3 style="text-align: center; margin-bottom: 2rem; color: var(--gold)">Dear Acit,</h3>
+      <div class="spacer"></div>
 
-        <div class="letter-text">
-          <p>Hai, <span class="highlight">Ibu Ketua</span>. (Jangan marah dipanggil ibu ya, ini edisi spesial tahun baru).</p>
-          <br />
-          <p>
-            Pertama-tama, terima kasih. Terima kasih sudah bertahan melewati tahun 2025 yang aku tahu berat banget buat kamu. Dari ngurusin proker BEM yang bikin pusing, drama organisasi, sampai tugas kuliah yang numpuk. Tapi kamu, dengan
-            tubuh *pocket-sized* itu, punya semangat kayak Hulk yang siap ngegebrak meja kalau ada yang nggak beres. Aku bangga banget sama kamu.
-          </p>
-          <br />
-          <p>
-            Aku tau kamu sering bilang kamu itu "Social Chameleon", menyesuaikan diri di mana pun kamu berada. Tapi aku bersyukur, ketika sama aku, kamu memilih untuk menjadi <span class="highlight">Acit yang asli</span>. Acit yang random,
-            yang manja, yang kadang *chaotic*, yang suka stiker aneh-aneh. *No facade, just you.* Dan itu, bagi aku, adalah versi terbaik dari Astrid Helviana.
-          </p>
-          <br />
-          <p>
-            Di tahun 2026 ini, aku nggak minta kamu untuk berubah. Tetaplah jadi Acit yang suka dance, yang suka anime, yang random. Cuma satu pintaku: <b>Don't bear the weight of the world alone.</b> Kalau dunia terasa terlalu berat untuk
-            dipikul sendirian, ingat, ada aku. Aku bakal jadi tempat kamu istirahat, jadi pendengar semua ceritamu, dan jadi partner kamu tumbuh.
-          </p>
-          <br />
-          <p>Kalau kamu sedih, aku ada. Kalau kamu senang, aku ada. Kalau kamu laper... tenang, Chef Syuby siap masakin <span class="easter-egg" onclick="triggerGeprek()">Ayam Geprek</span> spesial kapan aja.</p>
-          <br />
-          <p>Let's grow together this year. Less insecurity, more confidence. You are stronger than you think, prettier than you realize, and more special to me than words can say.</p>
-          <br />
-          <p style="text-align: center; margin-top: 3rem; font-family: var(--font-script); font-size: 1.8rem">I'll be here, always.</p>
-          <p style="text-align: center; font-weight: bold; margin-top: 0.5rem">- Syuby (a.k.a Vampire Bekasi) 🧛‍♂️</p>
-        </div>
+      <section class="scroll-reveal">
+        <h2 class="text-center"><span class="highlight">The Astrid</span> Starter Pack</h2>
+        <p class="text-center" style="color: #94a3b8; margin-bottom: 2rem">Hal-hal yang bikin Acit, jadi Acit.</p>
 
-        <div class="btn-group">
-          <button class="btn btn-secondary" onclick="triggerSecret()"><i class="fa-solid fa-moon"></i> Rahasia Malam</button>
+        <div class="grid-container">
+          <div class="glass-card trait-card text-center">
+            <div class="trait-icon">🧟‍♀️</div>
+            <div class="trait-title">The Hulk Mode</div>
+            <div class="trait-desc">Kecil (Pocket-sized) tapi kalau udah mode ketua, meja bisa digebrak. Semangatnya gak ngotak.</div>
+          </div>
+
+          <div class="glass-card trait-card text-center">
+            <div class="trait-icon">🎭</div>
+            <div class="trait-title">Social Chameleon</div>
+            <div class="trait-desc">Bisa menyesuaikan diri dimana aja. Profesional di BEM, tapi random dan manja kalau sama Syuby.</div>
+          </div>
+
+          <div class="glass-card trait-card text-center">
+            <div class="trait-icon">💅</div>
+            <div class="trait-title">Brick Red Nails</div>
+            <div class="trait-desc">Warna kuku wajib. Identitas visual utama selain stiker-stiker aneh di WhatsApp.</div>
+          </div>
+
+          <div class="glass-card trait-card text-center">
+            <div class="trait-icon">🦇</div>
+            <div class="trait-title">Vampire Schedule</div>
+            <div class="trait-desc">Aktif di malam hari. Suka begadang mikirin proker atau nonton anime. Butuh di-spam call biar bangun.</div>
+          </div>
         </div>
       </section>
 
-      <footer style="margin-top: 5rem; text-align: center; padding: 2rem; color: #64748b; font-size: 0.8rem">
-        <p>Developed with <span style="color: red">&hearts;</span> and a lot of patience (waiting for you to reply).</p>
-        <p>P.S. Ada <span class="easter-egg" onclick="triggerMinion()">🍌</span> tersembunyi di sini.</p>
+      <div class="spacer"></div>
+
+      <section class="scroll-reveal">
+        <div class="letter-wrapper">
+          <div class="paper-clip"><i class="fa-solid fa-paperclip"></i></div>
+          <h2 class="script-font text-center" style="margin-bottom: 2rem">A Note for You</h2>
+
+          <div class="letter-content">
+            <p><strong>Hai, Ibu Ketua. 👑</strong> (Iya, aku tau kamu benci dipanggil ibu, tapi ini momen spesial, jadi tahan dulu ya emosinya).</p>
+
+            <p>
+              Pertama, terima kasih. Terima kasih sudah bertahan melewati 2025 yang gila ini. Aku tau betapa beratnya beban di pundak kecil itu. Mulai dari drama organisasi, perbedaan pendapat yang susah disatuin, sampai rasa lelah karena
+              harus jadi penengah buat semua orang. <i>You did well, really well.</i>
+            </p>
+
+            <p>
+              Aku tau kamu sering merasa <i>insecure</i>, merasa tubuh kamu kecil, merasa keputusan kamu mungkin salah. Tapi di mata aku, kamu itu raksasa. Semangat kamu, ketulusan kamu ke anggota BPH, dan cara kamu peduli sama orang lain
+              itu luar biasa. Kamu itu <i>Hulk</i> dalam kemasan <i>pocket-sized</i>.
+            </p>
+
+            <p>
+              Terima kasih juga, karena di tengah kesibukan kamu jadi "bunglon sosial" di luar sana, kamu memilih untuk jadi <strong>Acit yang asli</strong> saat sama aku. Acit yang <i>chaotic</i>, yang kirim stiker random, yang manja, dan
+              yang apa adanya (no facade). Itu versi favorit aku.
+            </p>
+
+            <p>
+              Di 2026 ini, janjiku masih sama. Aku mungkin gak bisa ngilangin semua masalah BEM atau kuliah kamu, tapi aku janji aku bakal ada di sana. Aku bakal jadi "rumah" tempat kamu pulang kalau dunia lagi jahat. Aku bakal jadi
+              <i>Level 2 Friend</i> yang siap dengerin keluh kesahmu, entah itu soal proker atau soal anime.
+            </p>
+
+            <p>Jangan dipendem sendirian ya? Berat tau. Bagi sini sama aku.</p>
+
+            <p class="text-center" style="margin-top: 3rem; font-family: var(--font-serif); font-style: italic">"I would rather be awkward with you than not."</p>
+            <p class="text-center mono" style="margin-top: 1rem">- Syuby (Chef Pribadi & Alarm Berjalanmu)</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="spacer"></div>
+
+      <section class="scroll-reveal">
+        <h2 class="text-center" style="margin-bottom: 2rem">🎟️ Syuby's Special Vouchers</h2>
+        <p class="text-center" style="margin-bottom: 2rem; color: #94a3b8">Klik untuk klaim. Berlaku seumur hidup. No expiration date.</p>
+
+        <div class="grid-container">
+          <div class="glass-card voucher" onclick="claimVoucher(this, 'Ayam Geprek Spesial')">
+            <div style="font-size: 3rem">🍗</div>
+            <h3 style="margin: 10px 0">Chef Syuby Service</h3>
+            <p style="font-size: 0.9rem">Satu porsi Ayam Geprek buatan Syuby. Level pedas sesuai mood Acit.</p>
+            <div class="voucher-code">CODE: GEPREK-ENAK</div>
+          </div>
+
+          <div class="glass-card voucher" onclick="claimVoucher(this, 'Sesi Curhat Tanpa Judgment')">
+            <div style="font-size: 3rem">👂</div>
+            <h3 style="margin: 10px 0">Safe Space Pass</h3>
+            <p style="font-size: 0.9rem">Bebas ngeluh soal proker, temen, atau apa aja. Syuby cuma dengerin (mode patung).</p>
+            <div class="voucher-code">CODE: VENT-SESSION</div>
+          </div>
+
+          <div class="glass-card voucher" onclick="claimVoucher(this, 'Morning Call Service')">
+            <div style="font-size: 3rem">⏰</div>
+            <h3 style="margin: 10px 0">Anti-Kebo Protocol</h3>
+            <p style="font-size: 0.9rem">Spam call unlimited sampe bangun buat sahur atau kuliah pagi.</p>
+            <div class="voucher-code">CODE: WAKE-UP-NOW</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="spacer"></div>
+
+      <section class="scroll-reveal">
+        <h2 class="text-center" style="margin-bottom: 2rem">Our 2026 Manifestations ✨</h2>
+        <ul class="bucket-list">
+          <li class="bucket-item" onclick="toggleCheck(this)">
+            <div class="check-box"></div>
+            <span>Makan Ayam Geprek bareng</span>
+          </li>
+          <li class="bucket-item" onclick="toggleCheck(this)">
+            <div class="check-box"></div>
+            <span>Nonton Kembang Api (Hanabi) 🎆</span>
+          </li>
+          <li class="bucket-item" onclick="toggleCheck(this)">
+            <div class="check-box"></div>
+            <span>Survival Mode Semester Depan</span>
+          </li>
+          <li class="bucket-item" onclick="toggleCheck(this)">
+            <div class="check-box"></div>
+            <span>Acit gak insecure lagi soal tinggi badan 🤏</span>
+          </li>
+          <li class="bucket-item" onclick="toggleCheck(this)">
+            <div class="check-box"></div>
+            <span>Jalan-jalan random tanpa wacana</span>
+          </li>
+        </ul>
+      </section>
+
+      <div class="spacer"></div>
+
+      <footer class="text-center" style="padding-bottom: 5rem">
+        <p class="mono" style="color: #64748b">MADE WITH <i class="fa-solid fa-heart" style="color: var(--primary)"></i> BY SYUBY</p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #475569">P.S. Jangan lupa cek <span class="highlight" style="cursor: pointer" onclick="showMinion()">pisang</span> di sini.</p>
       </footer>
     </div>
 
-    <div class="music-control" id="music-btn" onclick="toggleMusic()">
-      <div class="music-bars">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
+    <div class="music-widget" onclick="toggleMusic()">
+      <div class="equalizer">
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
       </div>
+      <div style="font-size: 0.8rem">
+        <div style="font-weight: bold">you!</div>
+        <div style="color: #94a3b8">LANY</div>
+      </div>
+      <i class="fa-solid fa-play" id="play-icon" style="font-size: 0.8rem; margin-left: 5px"></i>
     </div>
 
-    <div class="overlay-bg" id="overlay-bg" onclick="closeModal()"></div>
-
-    <div class="modal" id="geprek-modal">
-      <h2 style="color: var(--gold)">🍗 Kupon Ayam Geprek</h2>
-      <p style="margin: 1rem 0">Kupon ini berlaku seumur hidup. Dapat ditukarkan ke Chef Syuby kapan saja saat Acit kelaparan atau badmood.</p>
-      <div style="font-size: 4rem">🌶️🥵🍚</div>
-      <button class="btn btn-secondary" style="margin: 1rem auto" onclick="closeModal()">Siap, Chef!</button>
-    </div>
-
-    <div class="modal" id="minion-modal">
-      <h2>BANANA!!</h2>
-      <img src="https://media.giphy.com/media/1uPiL9Amv5zkk/giphy.gif" alt="Minion" style="width: 200px; border-radius: 10px; margin: 1rem 0" />
-      <p>Acit kalau lagi random mirip ini. Lucu. 🤏</p>
-      <button class="btn btn-secondary" style="margin: 1rem auto" onclick="closeModal()">Hehe</button>
-    </div>
-
-    <div class="modal" id="secret-modal">
-      <h2 style="color: #ec4899">For the Strong Lil Lady</h2>
-      <p style="margin: 1rem 0; font-style: italic">"I would rather be awkward with you than not."</p>
-      <p>Janji ya, tahun ini jangan sering-sering mendem sedih sendirian? Hulk juga butuh istirahat. Vampire Bekasi siap dengerin curhatan jam 2 pagi.</p>
-      <div style="font-size: 3rem; margin-top: 1rem">🦇🌑</div>
-      <button class="btn btn-secondary" style="margin: 1rem auto" onclick="closeModal()">Janji 🤙</button>
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+      <div class="modal-box" id="modal-content"></div>
     </div>
 
     <script>
-      // --- 1. CONFIG & STATE ---
-      let wakeProgress = 0;
-      let isAwake = false;
+      /* --- CONFIGURATION --- */
       const audio = document.getElementById('bg-music');
-      let isPlaying = false;
-
-      // --- 2. MUSIC CONTROLS ---
-      function toggleMusic() {
-        if (audio.paused) {
-          audio.play();
-          document.querySelectorAll('.bar').forEach((b) => b.classList.add('animating'));
-          isPlaying = true;
-        } else {
-          audio.pause();
-          document.querySelectorAll('.bar').forEach((b) => b.classList.remove('animating'));
-          isPlaying = false;
-        }
-      }
-
-      // --- 3. MINIGAME LOGIC ---
-      const wakeBtn = document.getElementById('wake-btn');
-      const declineBtn = document.getElementById('decline-btn');
-      const phoneScreen = document.getElementById('phone-screen');
-      const progressBar = document.getElementById('wake-progress');
-      const levelText = document.getElementById('level-text');
-      const overlay = document.getElementById('game-overlay');
+      const gameOverlay = document.getElementById('game-overlay');
       const mainContent = document.getElementById('main-content');
+      const wakeFill = document.getElementById('progress-fill');
+      const percentText = document.getElementById('percent');
+      const callStatus = document.getElementById('call-status');
 
-      // Vibration function (works on android)
-      function vibrate(ms) {
-        if (navigator.vibrate) {
-          navigator.vibrate(ms);
+      let wakeProgress = 0;
+      let gameActive = true;
+
+      /* --- GAME LOGIC --- */
+      document.getElementById('btn-decline').addEventListener('click', () => {
+        // Shake effect animation
+        const frame = document.querySelector('.phone-frame');
+        frame.style.animation = 'shake 0.5s ease';
+        setTimeout(() => (frame.style.animation = ''), 500);
+
+        callStatus.innerText = 'Ih kok dimatiin?! 😡';
+        callStatus.style.color = '#ef4444';
+        setTimeout(() => {
+          callStatus.innerText = 'Calling Mobile...';
+          callStatus.style.color = '#94a3b8';
+        }, 1500);
+      });
+
+      document.getElementById('btn-wake').addEventListener('click', () => {
+        if (!gameActive) return;
+
+        wakeProgress += 10; // 10% per click
+        wakeFill.style.width = `${wakeProgress}%`;
+        percentText.innerText = `${wakeProgress}%`;
+
+        // Dynamic Status
+        if (wakeProgress > 20) callStatus.innerText = 'Ngulet dikit...';
+        if (wakeProgress > 50) callStatus.innerText = 'Nyawa belum kumpul...';
+        if (wakeProgress > 80) callStatus.innerText = 'Mencari kesadaran...';
+
+        if (wakeProgress >= 100) {
+          gameActive = false;
+          callStatus.innerText = 'CONNECTED!';
+          callStatus.style.color = '#22c55e';
+          percentText.innerText = 'Awake!';
+
+          setTimeout(finishGame, 800);
         }
+      });
+
+      function finishGame() {
+        // Play Music
+        audio
+          .play()
+          .then(() => {
+            document.getElementById('play-icon').classList.replace('fa-play', 'fa-pause');
+          })
+          .catch((err) => console.log('Audio autoplay prevented'));
+
+        // Transition
+        gameOverlay.style.opacity = '0';
+        setTimeout(() => {
+          gameOverlay.style.display = 'none';
+          mainContent.classList.remove('hidden');
+          mainContent.style.opacity = '1';
+
+          // Trigger animations
+          startTypewriter();
+          observer.observe(document.querySelector('.hero')); // Start observer
+        }, 1500);
       }
 
-      declineBtn.addEventListener('click', () => {
-        alert('Ih, kok dimatiin? Angkat dong Ibu Ketua! 😤');
-        vibrate(200);
-      });
+      /* --- CONTENT LOGIC --- */
 
-      wakeBtn.addEventListener('click', () => {
-        if (isAwake) return;
-
-        // Increment progress
-        wakeProgress += 10; // 10 clicks to wake up
-        progressBar.style.width = wakeProgress + '%';
-
-        // Shake effect
-        phoneScreen.classList.remove('shake');
-        void phoneScreen.offsetWidth; // trigger reflow
-        phoneScreen.classList.add('shake');
-
-        vibrate(50);
-
-        // Logic Text Change based on progress
-        const statusText = document.querySelector('.contact-status');
-        if (wakeProgress < 30) statusText.innerText = 'Calling Mobile...';
-        else if (wakeProgress < 60) statusText.innerText = 'Ngulet dikit...';
-        else if (wakeProgress < 90) statusText.innerText = 'Mencari nyawa...';
-        else statusText.innerText = 'Loading kesadaran...';
-
-        // Level text update (reverse logic: awake means less sleepy)
-        let sleepiness = 100 - wakeProgress;
-        levelText.innerText = sleepiness + '% Sleepy';
-
-        // Success
-        if (wakeProgress >= 100) {
-          isAwake = true;
-          statusText.innerText = 'Connected!';
-          statusText.style.color = '#22c55e';
-          levelText.innerText = 'Awake!';
-
-          setTimeout(() => {
-            // PLAY LOCAL MUSIC HERE
-            audio
-              .play()
-              .then(() => {
-                document.querySelectorAll('.bar').forEach((b) => b.classList.add('animating'));
-                isPlaying = true;
-              })
-              .catch((e) => console.log('Audio play failed (browser policy):', e));
-
-            // Transition
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-              overlay.style.display = 'none';
-              mainContent.classList.remove('hidden');
-              mainContent.style.opacity = '1';
-              startTypewriter();
-              createFireworks();
-            }, 1000);
-          }, 800);
-        }
-      });
-
-      // --- 4. TYPEWRITER EFFECT ---
-      const textToType = ['Hi, Acit.', 'Welcome to 2026.', "Let's make this year ours."];
+      // Typewriter
+      const phrases = ['Welcome to 2026.', "Let's grow together.", "I'm here for you."];
+      let phraseIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+      const typeSpeed = 100;
+      const deleteSpeed = 50;
+      const pauseTime = 2000;
 
       function startTypewriter() {
-        const container = document.getElementById('typewriter-text');
-        let lineIndex = 0;
-        let charIndex = 0;
+        const target = document.getElementById('typewriter');
+        const currentPhrase = phrases[phraseIndex];
 
-        function type() {
-          if (lineIndex < textToType.length) {
-            if (charIndex < textToType[lineIndex].length) {
-              container.innerHTML = textToType[lineIndex].substring(0, charIndex + 1) + '<span class="highlight">|</span>';
-              charIndex++;
-              setTimeout(type, 100);
-            } else {
-              // Line finished
-              setTimeout(() => {
-                container.innerHTML = textToType[lineIndex]; // remove cursor
-                lineIndex++;
-                charIndex = 0;
-                container.innerHTML += '<br>'; // new line
-                setTimeout(type, 500);
-              }, 1000);
-            }
-          }
+        if (isDeleting) {
+          target.innerText = currentPhrase.substring(0, charIndex - 1);
+          charIndex--;
+        } else {
+          target.innerText = currentPhrase.substring(0, charIndex + 1);
+          charIndex++;
         }
-        type();
+
+        if (!isDeleting && charIndex === currentPhrase.length) {
+          isDeleting = true;
+          setTimeout(startTypewriter, pauseTime);
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          setTimeout(startTypewriter, 500);
+        } else {
+          setTimeout(startTypewriter, isDeleting ? deleteSpeed : typeSpeed);
+        }
       }
 
-      // --- 5. EASTER EGG TRIGGERS ---
-      function openModal(id) {
-        document.getElementById('overlay-bg').classList.add('active');
-        document.getElementById(id).classList.add('active');
+      // Scroll Reveal Observer
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+
+      /* --- INTERACTIVE FUNCTIONS --- */
+
+      function toggleMusic() {
+        const icon = document.getElementById('play-icon');
+        if (audio.paused) {
+          audio.play();
+          icon.classList.replace('fa-play', 'fa-pause');
+          document.querySelectorAll('.eq-bar').forEach((b) => (b.style.animationPlayState = 'running'));
+        } else {
+          audio.pause();
+          icon.classList.replace('fa-pause', 'fa-play');
+          document.querySelectorAll('.eq-bar').forEach((b) => (b.style.animationPlayState = 'paused'));
+        }
       }
 
-      function closeModal() {
-        document.querySelectorAll('.modal').forEach((m) => m.classList.remove('active'));
-        document.getElementById('overlay-bg').classList.remove('active');
+      function claimVoucher(element, title) {
+        if (element.classList.contains('claimed')) return;
+
+        element.classList.add('claimed');
+        element.querySelector('.voucher-code').innerText = 'CLAIMED ✅';
+        element.querySelector('.voucher-code').style.background = '#22c55e';
+        element.querySelector('.voucher-code').style.color = 'white';
+
+        showModal(`
+          <h2 style="color: var(--gold); margin-bottom: 1rem;">Voucher Redeemed!</h2>
+          <p>Yeay! Voucher <strong>${title}</strong> berhasil diklaim.</p>
+          <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 10px;">Screenshot ini dan kirim ke Syuby buat ditukarkan kapan aja.</p>
+          <div style="font-size: 3rem; margin-top: 1rem;">🎫✨</div>
+        `);
       }
 
-      function triggerGeprek() {
-        openModal('geprek-modal');
-      }
-      function triggerMinion() {
-        openModal('minion-modal');
-      }
-      function triggerSecret() {
-        openModal('secret-modal');
+      function toggleCheck(item) {
+        item.classList.toggle('checked');
       }
 
-      // --- 6. CANVAS BACKGROUND (STARS) ---
+      function showMinion() {
+        showModal(`
+          <h2>BA-NA-NA! 🍌</h2>
+          <img src="https://media.giphy.com/media/1uPiL9Amv5zkk/giphy.gif" style="width: 200px; border-radius: 10px; margin: 1rem 0;">
+          <p>Acit kalau lagi random mirip ini. Gemes. 🤏</p>
+        `);
+      }
+
+      function showModal(content) {
+        const overlay = document.getElementById('modal-overlay');
+        const box = document.getElementById('modal-content');
+        box.innerHTML = content;
+        overlay.classList.add('active');
+      }
+
+      function closeModal(e) {
+        if (e.target.id === 'modal-overlay') {
+          document.getElementById('modal-overlay').classList.remove('active');
+        }
+      }
+
+      /* --- BACKGROUND ANIMATION (STARS) --- */
       const canvas = document.getElementById('star-canvas');
       const ctx = canvas.getContext('2d');
-      let width,
-        height,
-        stars = [];
+      let stars = [];
 
-      function resize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
       }
 
       class Star {
         constructor() {
-          this.x = Math.random() * width;
-          this.y = Math.random() * height;
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
           this.size = Math.random() * 2;
-          this.speedX = (Math.random() - 0.5) * 0.5;
-          this.speedY = (Math.random() - 0.5) * 0.5;
-          this.brightness = Math.random();
+          this.speedY = Math.random() * 0.5 + 0.1;
+          this.opacity = Math.random();
         }
         update() {
-          this.x += this.speedX;
-          this.y += this.speedY;
-          this.brightness += (Math.random() - 0.5) * 0.1;
-          if (this.brightness > 1) this.brightness = 1;
-          if (this.brightness < 0) this.brightness = 0;
-          if (this.x < 0) this.x = width;
-          if (this.x > width) this.x = 0;
-          if (this.y < 0) this.y = height;
-          if (this.y > height) this.y = 0;
+          this.y -= this.speedY;
+          if (this.y < 0) this.y = canvas.height;
+          this.opacity = Math.abs(Math.sin(Date.now() * 0.001 * this.speedY));
         }
         draw() {
-          ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
+          ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
           ctx.fill();
@@ -886,13 +1024,13 @@
       }
 
       function initStars() {
-        resize();
-        for (let i = 0; i < 150; i++) stars.push(new Star());
+        resizeCanvas();
+        for (let i = 0; i < 100; i++) stars.push(new Star());
         animateStars();
       }
 
       function animateStars() {
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         stars.forEach((star) => {
           star.update();
           star.draw();
@@ -900,40 +1038,10 @@
         requestAnimationFrame(animateStars);
       }
 
-      window.addEventListener('resize', resize);
+      window.addEventListener('resize', resizeCanvas);
       initStars();
 
-      // --- 7. FIREWORKS EFFECT ---
-      function createFireworks() {
-        const colors = ['#800000', '#fbbf24', '#ec4899', '#ffffff'];
-        for (let i = 0; i < 50; i++) {
-          const particle = document.createElement('div');
-          particle.style.position = 'fixed';
-          particle.style.left = '50%';
-          particle.style.top = '50%';
-          particle.style.width = '5px';
-          particle.style.height = '5px';
-          particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-          particle.style.borderRadius = '50%';
-          particle.style.pointerEvents = 'none';
-          document.body.appendChild(particle);
-
-          const angle = Math.random() * Math.PI * 2;
-          const velocity = 5 + Math.random() * 10;
-          const tx = Math.cos(angle) * velocity * 20;
-          const ty = Math.sin(angle) * velocity * 20;
-
-          particle.animate(
-            [
-              { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-              { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 },
-            ],
-            { duration: 1000 + Math.random() * 1000, easing: 'cubic-bezier(0, .9, .57, 1)', delay: Math.random() * 200 }
-          ).onfinish = () => particle.remove();
-        }
-      }
-
-      console.log('Developed by Syuby for Acit.');
+      console.log('Made with ❤️ by Syuby for Acit');
     </script>
   </body>
 </html>
